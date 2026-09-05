@@ -86,28 +86,17 @@ gates, so this is a supply fix, not a guarantee.
 ## 4. Fix 2: regenerate under the container's constraints instead of filtering
 
 The sampler is good at saying **where** to grasp (the contact on the object) and, inside
-a box, bad at saying **how** (the orientation). So instead of discarding a candidate
-that would hit a wall, we keep its contact point and search the admissible orientation
-closest to the original: rotations of the closing line about the approach axis, tilts,
-and the 180° flip, each checked against the box walls, the floor, neighbouring objects
-and the arm's descent corridor, using the gripper's real jaw width for the wall sweep.
-If no orientation fits, the contact is in a **dead zone** and
-the candidate is dropped: that is information, not a failure. Confidence is then
-re-scored with GraspGen's own discriminator on the *new* pose (the inherited confidence
-was a median of 40° away from the pose actually executed).
-
-Measured effect on the same gates (table above): survivors after the wall sweep go from
-**3.9 to 55.4 per attempt**, and after regeneration **82 % of the candidates sit inside
-the top-down cone** (23 % before). The dead zone is large: on average **253 of the 400
-contact points admit no orientation at all** inside the box, and it grows with object
-size (the largest garment, 30 cm, loses 253–276 samples; the smallest, 18 cm, 40–184).
-
-What still kills a regenerated candidate is, again, the container:
+a box, bad at saying **how** (the orientation). So instead of discarding a candidate that
+would hit a wall, we keep its contact point and look for an orientation that fits the
+container. Measured on the same gates (table above): survivors after the wall sweep go
+from **3.9 to 55.4 per attempt**, and **82 % of the regenerated candidates sit inside the
+top-down cone** (23 % before). What still kills a regenerated candidate is, again, the
+container:
 
 ![scene gate reasons](figures/fig4_scene_gate_reasons.png)
 
-The write-up of the regeneration method, with baselines and ablations, is in
-preparation. This repository only contains the diagnosis and the flip.
+The method, with baselines and ablations, is being written up separately. This
+repository only contains the diagnosis and the flip.
 
 ## 5. Two questions we would like answered
 
