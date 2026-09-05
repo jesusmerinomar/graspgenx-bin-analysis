@@ -92,6 +92,25 @@ ax.set_xlim(0, 85); ax.set_xlabel(f"% of {tot:,} regenerated candidates at the s
 ax.set_title("After regeneration, what still kills a candidate is the container", fontsize=10)
 fig.tight_layout(); fig.savefig(os.path.join(F, "fig4_scene_gate_reasons.png"), dpi=160); plt.close(fig)
 
+# ── 5. does the discriminator's confidence predict fitting in the box? ───────
+cf = list(csv.DictReader(open(os.path.join(D, "confidence_vs_feasibility.csv"))))
+c_ok = np.array([float(r["discriminator_confidence"]) for r in cf if r["survives_box_gates"] == "1"])
+c_ko = np.array([float(r["discriminator_confidence"]) for r in cf if r["survives_box_gates"] == "0"])
+rng = np.random.default_rng(0); a = rng.choice(c_ok, min(len(c_ok), 3000), replace=False); b = rng.choice(c_ko, min(len(c_ko), 3000), replace=False)
+auc = (a[:, None] > b[None, :]).mean() + 0.5 * (a[:, None] == b[None, :]).mean()
+top8 = []
+for t in sorted(set(r["trace"] for r in cf)):
+    rr = sorted([r for r in cf if r["trace"] == t], key=lambda r: -float(r["discriminator_confidence"]))[:8]
+    top8.append(sum(r["survives_box_gates"] == "1" for r in rr))
+fig, ax = plt.subplots(figsize=(7.2, 3.3))
+bins = np.linspace(0, 1, 26)
+ax.hist(c_ko, bins=bins, weights=np.full(len(c_ko), 100 / len(c_ko)), color=C_OFF, alpha=0.6, label=f"killed by walls / floor / neighbours (n={len(c_ko):,})")
+ax.hist(c_ok, bins=bins, weights=np.full(len(c_ok), 100 / len(c_ok)), color=C_ON, alpha=0.6, label=f"fits in the box (n={len(c_ok):,})")
+ax.set_xlabel("GraspGen discriminator confidence of the candidate"); ax.set_ylabel("% of candidates")
+ax.set_title(f"Confidence does not know about the box: AUC = {auc:.2f} · top-8 by confidence → {np.mean(top8):.1f} fit", fontsize=10)
+ax.legend(fontsize=8.5, frameon=False)
+fig.tight_layout(); fig.savefig(os.path.join(F, "fig5_confidence_vs_box.png"), dpi=160); plt.close(fig)
+
 # ── headline numbers ─────────────────────────────────────────────────────────
 zm = [float(r["dead_zone"]) for r in cells if r["dead_zone"] != ""]
 ok_off = sum(r["outcome"] == "OK" for r in off); n_off = sum(r["outcome"] != "" for r in off)
@@ -101,4 +120,5 @@ print(f"flip: cone {tot_r:.1f} -> {tot_f:.1f} per 400 (+{100 * (tot_f / tot_r - 
 print("funnel OFF:", [f"{v:.1f}" for v in m_off], f"n={len(off)}  pick+place OK {ok_off}/{n_off}")
 print("funnel ON :", [f"{v:.1f}" for v in m_on], f"n={len(on)}  pick+place OK {ok_on}/{n_on}")
 print(f"dead zone: mean {np.mean(zm):.0f}/400 contact points with no admissible orientation (n={len(zm)})")
+print(f"confidence vs box gates: AUC {auc:.3f} · mean conf fits {c_ok.mean():.3f} / killed {c_ko.mean():.3f} · top-8 by conf fit {np.mean(top8):.1f}/8 (n={len(top8)})")
 print("scene gate after regeneration:", {k: f"{100 * v / tot:.1f}%" for k, v in vals.items()})

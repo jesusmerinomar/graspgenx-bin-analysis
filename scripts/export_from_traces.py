@@ -24,6 +24,9 @@ def angle_from_down(G):
 
 rows_cand, rows_trace, samples = [], [], {}
 reasons = {}
+rows_conf = []          # per regenerated candidate: discriminator confidence vs. surviving the box gates
+def _key(G):
+    return [tuple(np.round(g, 5).ravel()) for g in G]
 for d in sorted(glob.glob(os.path.join(src, "intento_*"))):
     f2 = glob.glob(os.path.join(d, "*_regen_admisible.npz"))
     if not f2:
@@ -46,6 +49,14 @@ for d in sorted(glob.glob(os.path.join(src, "intento_*"))):
         for i, ai in enumerate(a3):
             rows_cand.append((tid, obj, "regenerated", i, round(float(ai), 2)))
     f5 = glob.glob(os.path.join(d, "*_escena_suelo_pasillo.npz"))
+    f6 = glob.glob(os.path.join(d, "*_antimesa_antipared.npz"))
+    if f3 and f5 and f6:
+        conf = dict(zip(_key(G3), np.load(f3[0], allow_pickle=True)["confs"]))
+        z6 = np.load(f6[0], allow_pickle=True)
+        alive = set(k for k, v in zip(_key(z6["grasps"]), z6["vivos"]) if v)
+        for k in _key(np.load(f5[0], allow_pickle=True)["grasps"]):
+            if k in conf:
+                rows_conf.append((tid, obj, round(float(conf[k]), 4), int(k in alive)))
     if f5:
         for m in np.load(f5[0], allow_pickle=True)["motivos"]:
             reasons[str(m)] = reasons.get(str(m), 0) + 1
@@ -62,6 +73,8 @@ with open(os.path.join(data, "per_trace_summary.csv"), "w", newline="") as fo:
     w = csv.writer(fo)
     w.writerow(["trace", "object", "n_raw", "n_pointing_up", "n_in_cone60", "n_in_cone60_with_flip", "n_regenerated"])
     w.writerows(rows_trace)
+with open(os.path.join(data, "confidence_vs_feasibility.csv"), "w", newline="") as fo:
+    w = csv.writer(fo); w.writerow(["trace", "object", "discriminator_confidence", "survives_box_gates"]); w.writerows(rows_conf)
 with open(os.path.join(data, "scene_gate_reasons.csv"), "w", newline="") as fo:
     w = csv.writer(fo); w.writerow(["reason", "count"]); w.writerows(sorted(reasons.items(), key=lambda kv: -kv[1]))
 os.makedirs(os.path.join(data, "examples"), exist_ok=True)

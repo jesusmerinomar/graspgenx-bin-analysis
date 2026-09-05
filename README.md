@@ -98,7 +98,55 @@ container:
 The method, with baselines and ablations, is being written up separately. This
 repository only contains the diagnosis and the flip.
 
-## 5. Two questions we would like answered
+## 5. Why the sampler's confidence cannot pick the grasp inside a box
+
+Once candidates survive, one has to be chosen. GraspGen ships a discriminator whose
+confidence is meant to rank its own samples, and on a free-standing rigid object that
+is a reasonable choice. Inside a container, with garments, it is not, for two reasons
+we can measure.
+
+**It does not know about the box.** We took the discriminator's confidence of each
+candidate and asked whether it predicts surviving the container gates (walls, floor,
+neighbours, descent sweep). It does not: AUC 0.45 over 6,847 candidates, i.e. slightly
+*worse* than a coin flip, and of the 8 highest-confidence candidates per attempt only
+**1.4 fit in the box**.
+
+![confidence vs box](figures/fig5_confidence_vs_box.png)
+
+**It does not know what a good closure is on our objects.** The discriminator was
+trained to tell a stable grasp from an unstable one on rigid meshes. Whether the jaws
+will close on *material*, and on the right material, is a different question, and on
+cloth it is the whole question. Over 328 closure/outcome pairs from our logs, the
+**shape of the closure** predicts the pick far better than any score assigned before it:
+
+| how the jaws closed | pick + place OK |
+|---|---|
+| both jaws stopped on material, symmetrically | 205 / 277 · **74 %** |
+| one jaw stopped, the other went to its stop | 2 / 12 · 17 % |
+| both jaws went to their stop (closed on nothing) | 1 / 39 · **3 %** |
+
+So the ranking has to look at the geometry of the closure itself, on the object's own
+point cloud, and it has to look at different things for different objects:
+
+- **where the centre of mass sits** relative to the closing line: off-centre grasps of
+  a rigid object twist and slip; on a garment the same offset is harmless;
+- **how much material ends up between the fingertips**, and whether it is the part
+  of the object the closure was aimed at, or a fold or an edge that will slide out;
+- **where the fingertips land**: on a rigid object a fingertip landing *on* the object
+  is a collision and the candidate must be vetoed; on cloth the material does not stop
+  at the jaw, so the same rule, applied blindly, vetoes almost every candidate;
+- **whether the closing line crosses the feature** (a cuff, a handle, a fold) or runs
+  along it, and whether it pinches the tip of the feature, from where it slips;
+- **verticality**, only as a mild tie-breaker so the planner does not get to choose;
+- and the sampler's confidence itself, used as a **floor**, not as the score: the
+  network's *no* travels much better than its *yes*.
+
+The weights, and which of these terms is a veto and which a multiplier, depend on the
+object class. That is the part we keep in the cell and do not describe here; the point
+of this section is only that a single confidence learned on a fixed set of rigid meshes
+is not enough to choose a grasp inside a box.
+
+## 6. Two questions we would like answered
 
 1. Is contact with large static obstacles (a box wall a few millimetres from the
    object) considered in-distribution for GraspGen, or is the intended usage to crop
@@ -115,6 +163,7 @@ repository only contains the diagnosis and the flip.
 | `data/per_trace_summary.csv` | one row per attempt: samples pointing up, inside the cone, inside the cone with flip, regenerated count |
 | `data/funnel_per_cell.csv` | one row per (object, pose) attempt inside the box: survivors after each gate, regeneration on/off, outcome |
 | `data/scene_gate_reasons.csv` | why regenerated candidates die at the scene gate |
+| `data/confidence_vs_feasibility.csv` | one row per candidate: discriminator confidence and whether it survived the container gates |
 | `data/examples/<object>.npz` | full example per object: `object_cloud` (N×3, world frame, metres), `raw_grasps` (400×4×4, GraspGen convention: +Z approach, X closing line), `regenerated_grasps` |
 
 Object poses P1–P4 in `funnel_per_cell.csv` are object orientations (canonical, lying,
