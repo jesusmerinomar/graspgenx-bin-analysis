@@ -9,7 +9,7 @@
 <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey">
 </p>
 
-![same gates, both sides](figures/fig0_same_gates.png)
+![GraspGen-X inside a container](figures/cover.png)
 
 <sub>The cell's own container gates — walls, floor, neighbouring objects, descent sweep —
 applied to both sides. Left: the sampler's candidates, 32 of 400 clear the box. Right:
@@ -119,10 +119,10 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
-The comparison below is the cell's own gates — walls, floor, neighbouring objects and
-the full descent sweep — applied to both sides. Two runs of the same batch of three
-objects in the box, one with regeneration off and one on (the figure at the top of this
-page is the first row):
+The comparison is the cell's own gates — walls, floor, neighbouring objects and the full
+descent sweep — applied to both sides. Two runs of the same batch of three objects in the
+box, one with regeneration off and one on. The figure at the top of this page shows the
+first row:
 
 | pick | generate → filter | generate → regenerate → filter |
 |---|---|---|
