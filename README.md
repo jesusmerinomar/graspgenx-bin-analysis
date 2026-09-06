@@ -9,12 +9,12 @@
 <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey">
 </p>
 
-![raw vs regenerated candidates inside the box](figures/fig0_hedgehog_yellow_trim.png)
+![same gates, both sides](figures/fig0_same_gates.png)
 
-<sub>One object inside the box, the same 400 GraspGen-X samples in both panels. Left: as
-sampled — half of them approach from under the box floor and most of the rest through a
-side wall. Right: after regenerating each candidate under the container's
-constraints.</sub>
+<sub>The cell's own container gates — walls, floor, neighbouring objects, descent sweep —
+applied to both sides. Left: the sampler's candidates, 32 of 400 clear the box. Right:
+the same contacts regenerated under the container's constraints, 84 clear it. Three
+objects in the box; details and the second pick in §4.</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
@@ -51,6 +51,11 @@ the good ones. This repository documents that, and the two things that fixed it 
 
 Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
+
+![raw candidates inside the box](figures/fig0_hedgehog_yellow_trim.png)
+
+<sub>The 400 raw samples for one object in the box, and what is left after regeneration.
+Half of them approach from under the box floor.</sub>
 
 ![approach angles](figures/fig1_approach_angles.png)
 
@@ -116,9 +121,8 @@ container.
 
 The comparison below is the cell's own gates — walls, floor, neighbouring objects and
 the full descent sweep — applied to both sides. Two runs of the same batch of three
-objects in the box, one with regeneration off and one on:
-
-![same gates, both sides](figures/fig0_same_gates.png)
+objects in the box, one with regeneration off and one on (the figure at the top of this
+page is the first row):
 
 | pick | generate → filter | generate → regenerate → filter |
 |---|---|---|
