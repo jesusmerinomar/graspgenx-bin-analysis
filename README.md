@@ -1,12 +1,31 @@
-# GraspGen inside a container: measurements from a bin-picking cell
+# GraspGen-X inside a container
 
-**What this is.** Numbers, figures and per-candidate data from running NVIDIA's
-[GraspGen](https://github.com/NVlabs/GraspGen) / GraspGen-X as the grasp generator of a
-bin-picking cell in simulation: a UR5e with a parallel gripper picking rigid objects
-and garments out of a cardboard box. Everything here is measured, nothing is tuned for
-the plot. Scripts under `scripts/` regenerate every figure from the CSVs under `data/`.
+**Bin-picking measurements on top of [NVIDIA GraspGen-X](https://github.com/NVlabs/GraspGenX)**
 
-**Why we measured it.** GraspGen is trained on free-floating objects with SO(3)
+<p>
+<a href="https://github.com/NVlabs/GraspGenX"><img alt="Built on GraspGen-X" src="https://img.shields.io/badge/built%20on-GraspGen--X-76B900"></a>
+<a href="https://arxiv.org/abs/2606.00998"><img alt="GraspGen-X paper" src="https://img.shields.io/badge/arxiv-2606.00998-blue"></a>
+<a href="https://developer.nvidia.com/isaac/sim"><img alt="Isaac Sim 6.0.1" src="https://img.shields.io/badge/Isaac%20Sim-6.0.1-76B900"></a>
+<img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey">
+</p>
+
+![raw vs regenerated candidates inside the box](figures/fig0_hedgehog_yellow_trim.png)
+
+**What this is.** Numbers, figures and per-candidate data from running
+[GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
+bin-picking cell in simulation: a UR5e with a WSG-50 parallel gripper picking rigid
+objects and garments **out of a cardboard box**. GraspGen-X is used unmodified, through
+its public sampler API and our own gripper descriptor (`gripper/wsg50_long/config.json`,
+generated with their gripper wizard). Everything here is measured on that setup; nothing
+is tuned for the plot. Scripts under `scripts/` regenerate every figure from the CSVs
+under `data/`.
+
+**This is a continuation of their work, not a fork.** No GraspGen-X code is copied here.
+`scripts/run_graspgenx_on_example.py` shows how to reproduce our starting point from
+their repository and our example clouds, so every number below can be traced back to
+their sampler.
+
+**Why we measured it.** GraspGen-X is trained on free-floating objects with SO(3)
 augmentation. On a table that is fine: you keep the top-down samples and discard the
 rest. **Inside a container it is not fine.** Every candidate has to clear four walls, a
 floor and whatever else is in the box, and the standard pipeline
@@ -25,7 +44,7 @@ the good ones. This repository documents that, and the two things that fixed it 
 
 ## 1. Half of the samples point away from the box floor
 
-Approach direction of the 400 raw samples, for 45 attempts (18,000 candidates) on
+Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
 
 ![approach angles](figures/fig1_approach_angles.png)
@@ -164,6 +183,7 @@ is not enough to choose a grasp inside a box.
 | `data/funnel_per_cell.csv` | one row per (object, pose) attempt inside the box: survivors after each gate, regeneration on/off, outcome |
 | `data/scene_gate_reasons.csv` | why regenerated candidates die at the scene gate |
 | `data/confidence_vs_feasibility.csv` | one row per candidate: discriminator confidence and whether it survived the container gates |
+| `gripper/wsg50_long/config.json` | the WSG-50 descriptor we feed to GraspGen-X (their wizard format) |
 | `data/examples/<object>.npz` | full example per object: `object_cloud` (N×3, world frame, metres), `raw_grasps` (400×4×4, GraspGen convention: +Z approach, X closing line), `regenerated_grasps` |
 
 Object poses P1–P4 in `funnel_per_cell.csv` are object orientations (canonical, lying,
@@ -176,8 +196,32 @@ pip install -r requirements.txt
 python scripts/make_figures.py      # figures/ + headline numbers, from data/
 ```
 
+```bash
+# reproduce the starting point with GraspGen-X itself (needs their repo + checkpoints + a GPU)
+GRASPGENX_CHECKPOINTS=<ckpt root> python scripts/run_graspgenx_on_example.py yellow_trim
+```
+
 `scripts/export_from_traces.py` and `scripts/parse_logs.py` document how the CSVs were
 produced from the cell's per-candidate traces and run logs (not published; multi-GB).
+
+## Citing GraspGen-X
+
+Everything here builds on their model. If you use this repository, cite their work:
+
+```bibtex
+@inproceedings{graspgenx2026,
+  title     = {GraspGen-X: Cross-Embodiment 6-DOF Diffusion-based Grasping},
+  author    = {Han, Beining and Chao, Yu-Wei and Coumans, Erwin and Eppner, Clemens
+               and Sundaralingam, Balakumar and Deng, Jia and Birchfield, Stan
+               and Murali, Adithyavairavan},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR)},
+  year      = {2026},
+}
+```
+
+Thanks to the GraspGen-X authors for releasing the model, the checkpoints and the
+gripper wizard; without them none of this would exist.
 
 ## Who
 

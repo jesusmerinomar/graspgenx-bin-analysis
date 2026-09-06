@@ -1,0 +1,60 @@
+{
+    "open": {
+        "thumb_joint": 0.055,
+        "index_joint": 0.055
+    },
+    "close": {
+        "thumb_joint": 0.003,
+        "index_joint": 0.003
+    },
+    "fingertip": [
+        0.0,
+        0.0,
+        0.154
+    ],
+    "sweep_volume": {
+        "extents": [
+            0.104,
+            0.03,
+            0.1452
+        ],
+        "offset": [
+            0.0,
+            0.0,
+            0.1314
+        ],
+        "extents2": [
+            0.052,
+            0.03,
+            0.1452
+        ],
+        "offset2": [
+            0.0,
+            0.0,
+            0.1314
+        ]
+    },
+    "links": [
+        "gripper_link",
+        "thumb_link",
+        "index_link"
+    ],
+    "standoff": [
+        0.0,
+        0.0726
+    ],
+    "bbox": [
+        [
+            -0.073,
+            -0.025,
+            0.0
+        ],
+        [
+            0.073,
+            0.025,
+            0.214
+        ]
+    ],
+    "symmetric": true,
+    "type": "parallel_2f"
+}
