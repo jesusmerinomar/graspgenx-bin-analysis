@@ -33,20 +33,27 @@ def draw_box(ax, b):
              [(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)],          # far wall
              [(x0, y0, z0), (x0, y1, z0), (x0, y1, z1), (x0, y0, z1)],          # left wall
              [(x1, y0, z0), (x1, y1, z0), (x1, y1, z1), (x1, y0, z1)]]          # right wall
-    ax.add_collection3d(Poly3DCollection(faces[:1], facecolor=C_FLOOR, edgecolor="none", alpha=0.95, zsort="min"))
-    ax.add_collection3d(Poly3DCollection(faces[1:], facecolor=C_FLOOR, edgecolor="none", alpha=0.22, zsort="min"))
+    ax.add_collection3d(Poly3DCollection(faces[:1], facecolor=C_FLOOR, edgecolor="none", alpha=0.95, zorder=1))
+    ax.add_collection3d(Poly3DCollection(faces[1:], facecolor=C_FLOOR, edgecolor="none", alpha=0.22, zorder=4))
     P = np.array([[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0],
                   [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]])
     for a, b_ in [(0, 1), (1, 2), (2, 3), (3, 0), (4, 5), (5, 6), (6, 7), (7, 4), (0, 4), (1, 5), (2, 6), (3, 7)]:
-        ax.plot(*zip(P[a], P[b_]), color=C_BOX, lw=1.4, zorder=1)
+        ax.plot(*zip(P[a], P[b_]), color=C_BOX, lw=1.4, zorder=5)
 
 def panel(ax, cloud, G, b, colour, title, sub):
+    # mplot3d's automatic depth sorting paints the opaque floor over the point cloud;
+    # order the artists by hand instead (segments below 0 · floor 1 · segments above 2 ·
+    # cloud 3 · translucent walls 4 · box edges 5)
+    ax.computed_zorder = False
     draw_box(ax, b)
-    ax.scatter(cloud[:, 0], cloud[:, 1], cloud[:, 2], s=2.2, c=C_CLOUD, alpha=0.75, lw=0, depthshade=False)
     a, c, ang = geom(G)
     for i in range(len(a)):
+        under = min(a[i, 2], c[i, 2]) < b["z0"]          # segment escaping below the box floor
         ax.plot([a[i, 0], c[i, 0]], [a[i, 1], c[i, 1]], [a[i, 2], c[i, 2]],
-                color=colour(ang[i]), lw=0.85, alpha=0.8, solid_capstyle="round")
+                color=colour(ang[i]), lw=0.85, alpha=0.8, solid_capstyle="round",
+                zorder=0 if under else 2)
+    ax.scatter(cloud[:, 0], cloud[:, 1], cloud[:, 2], s=2.2, c=C_CLOUD, alpha=0.85, lw=0,
+               depthshade=False, zorder=3)
     cx, cy, cz = (b["x0"] + b["x1"]) / 2, (b["y0"] + b["y1"]) / 2, b["z0"]
     hx = (b["x1"] - b["x0"]) / 2 + 0.035
     ax.set_xlim(cx - hx, cx + hx); ax.set_ylim(cy - hx, cy + hx); ax.set_zlim(cz - 0.085, cz + 1.15 * hx)
