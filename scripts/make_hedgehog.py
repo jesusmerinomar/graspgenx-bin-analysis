@@ -55,7 +55,7 @@ def panel(ax, cloud, G, b, colour, title, sub):
     return title, sub
 
 def main() -> int:
-    obj = sys.argv[1] if len(sys.argv) > 1 else "camiseta_doblada"
+    obj = sys.argv[1] if len(sys.argv) > 1 else "yellow_trim"
     z = np.load(os.path.join(D, f"{obj}.npz")); b = json.load(open(os.path.join(D, "box_geometry.json")))
     cloud, raw, reg = z["object_cloud"], z["raw_grasps"], z["regenerated_grasps"]
     ang = geom(raw)[2]
@@ -65,7 +65,7 @@ def main() -> int:
     ax1 = fig.add_subplot(1, 2, 1, projection="3d"); ax2 = fig.add_subplot(1, 2, 2, projection="3d")
     panel(ax1, cloud, raw, b, lambda t: C_UP if t > UP else (C_SIDE if t > CONE else C_CONE), "", "")
     panel(ax2, cloud, reg, b, lambda t: C_REG, "", "")
-    for x, t, sub in ((0.27, "GraspGen-X, as sampled", f"400 candidates · only {n_cone} usable from above"),
+    for x, t, sub in ((0.27, "GraspGen-X, as sampled", f"400 candidates · {n_cone} usable from above"),
                       (0.76, "after constraint-aware regeneration", f"{len(reg)} candidates, all reachable inside the box")):
         fig.text(x, 0.96, t, ha="center", fontsize=12.5, fontweight="bold")
         fig.text(x, 0.90, sub, ha="center", fontsize=10, color="#333")
@@ -74,9 +74,12 @@ def main() -> int:
                     f"usable from above ({n_cone})", f"regenerated ({len(reg)})"],
                loc="lower center", ncol=4, frameon=False, fontsize=9.5, bbox_to_anchor=(0.5, 0.05))
     ext = 100 * (cloud.max(0) - cloud.min(0))
-    fig.text(0.5, 0.018, f"Folded garment {ext[0]:.0f} × {ext[1]:.0f} cm in a "
+    ins = ((cloud[:, 0] > b["x0"]) & (cloud[:, 0] < b["x1"]) & (cloud[:, 1] > b["y0"]) & (cloud[:, 1] < b["y1"]))
+    lo, hi = np.percentile(cloud[ins], [2, 98], axis=0)
+    gap = 100 * min(lo[1] - b["y0"], b["y1"] - hi[1])
+    fig.text(0.5, 0.018, f"Object {ext[0]:.0f} × {ext[1]:.0f} cm in a "
                          f"{100 * (b['x1'] - b['x0']):.0f} × {100 * (b['y1'] - b['y0']):.0f} × "
-                         f"{100 * (b['z1'] - b['z0']):.0f} cm box, under 1 cm from each side wall. "
+                         f"{100 * (b['z1'] - b['z0']):.0f} cm box, {gap:.1f} cm from the nearest side wall. "
                          f"Each segment is one candidate's approach axis, drawn back from its fingertip contact.",
              ha="center", fontsize=9, color="#555")
     fig.subplots_adjust(left=0.0, right=1.0, top=0.93, bottom=0.10, wspace=0.0)
