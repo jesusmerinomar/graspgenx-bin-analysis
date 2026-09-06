@@ -112,15 +112,31 @@ gates, so this is a supply fix, not a guarantee.
 The sampler is good at saying **where** to grasp (the contact on the object) and, inside
 a box, bad at saying **how** (the orientation). So instead of discarding a candidate that
 would hit a wall, we keep its contact point and look for an orientation that fits the
-container. Measured on the same gates (table above): survivors after the wall sweep go
-from **3.9 to 55.4 per attempt**, and **82 % of the regenerated candidates sit inside the
-top-down cone** (23 % before). What still kills a regenerated candidate is, again, the
-container:
+container.
+
+The comparison below is the cell's own gates — walls, floor, neighbouring objects and
+the full descent sweep — applied to both sides. Two runs of the same batch of three
+objects in the box, one with regeneration off and one on:
+
+![same gates, both sides](figures/fig0_same_gates.png)
+
+| pick | generate → filter | generate → regenerate → filter |
+|---|---|---|
+| `yellow_trim` | 400 → 129 in cone → 58 → **32** | 400 → 273 regenerated → 262 → 200 → **84** |
+| `usb_c_cable` | 400 → 73 in cone → 30 → **8** | 400 → 197 regenerated → 196 → 119 → **46** |
+
+The batch is dropped into the box, so the two runs are not the same physical arrangement
+and these are two runs, not a statistic. The aggregate over the runs measured in §2 is
+3.9 survivors per attempt without regeneration and 55.4 with it.
+
+Notice where the candidates die without regeneration: of the 73 that clear the cone in
+the second row, **40 are killed by the scene gate**, which is the walls and the
+neighbouring objects. That gate is nearly a no-op on a table.
 
 ![scene gate reasons](figures/fig4_scene_gate_reasons.png)
 
-The method, with baselines and ablations, is being written up separately. This
-repository only contains the diagnosis and the flip.
+The method itself, with baselines and ablations, is being written up separately. This
+repository contains the diagnosis, the flip, and this measurement.
 
 ## 5. Why the sampler's confidence cannot pick the grasp inside a box
 
@@ -186,6 +202,7 @@ is not enough to choose a grasp inside a box.
 | `data/candidate_angles.csv` | one row per candidate: attempt, object, stage (`raw` / `regenerated`), angle between approach direction and straight-down |
 | `data/per_trace_summary.csv` | one row per attempt: samples pointing up, inside the cone, inside the cone with flip, regenerated count |
 | `data/funnel_per_cell.csv` | one row per (object, pose) attempt inside the box: survivors after each gate, regeneration on/off, outcome |
+| `data/gate_comparison/*.npz` | the two runs behind the figure in §4: candidate poses, whether each clears the container, and the object cloud |
 | `data/scene_gate_reasons.csv` | why regenerated candidates die at the scene gate |
 | `data/confidence_vs_feasibility.csv` | one row per candidate: discriminator confidence and whether it survived the container gates |
 | `gripper/wsg50_long/config.json` | the WSG-50 descriptor we feed to GraspGen-X (their wizard format) |
