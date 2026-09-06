@@ -9,7 +9,12 @@
 <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey">
 </p>
 
-![raw vs regenerated candidates inside the box](figures/fig0_hedgehog_yellow_trim.png)
+![raw vs regenerated candidates inside the box](figures/fig0_hedgehog_camiseta_doblada.png)
+
+<sub>The same folded t-shirt, the same 400 GraspGen-X samples. Left: as sampled — half of
+them approach from under the box floor, most of the rest through a side wall, 55 are
+usable from above. Right: after regenerating each candidate under the container's
+constraints.</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
