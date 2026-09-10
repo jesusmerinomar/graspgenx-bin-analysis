@@ -55,14 +55,14 @@ def panels():
     out = []
     for tag in ("regen_off", "regen_on"):
         png = os.path.join(HERE, "..", "figures", "src", f"panel_{tag}.png")
-        n, ok = vs.render_panel(os.path.join(D, f"{tag}.npz"), b, png, size=(6.6, 5.2), dpi=170, dark=True)
-        out.append((trim(Image.open(png).convert("RGB"), (13, 15, 19)), n, ok))
+        n, ok = vs.render_panel(os.path.join(D, f"{tag}.npz"), b, png, size=(6.6, 5.2), dpi=170, dark=False)
+        out.append((trim(Image.open(png).convert("RGB"), (255, 255, 255)), n, ok))
     pad = 30
     w = max(i.width for i, _, _ in out) + 2 * pad           # both panels share one frame,
     h = max(i.height for i, _, _ in out) + 2 * pad          # so the numbers under them line up
     fixed = []
     for img, n, ok in out:
-        card = Image.new("RGB", (w, h), (13, 15, 19))
+        card = Image.new("RGB", (w, h), (255, 255, 255))
         card.paste(img, ((w - img.width) // 2, (h - img.height) // 2))
         fixed.append((card, n, ok))
     return fixed
