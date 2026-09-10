@@ -60,7 +60,7 @@ def main() -> int:
     ps = panels()
     pw = 820
     cards = [(p.resize((pw, int(p.height * pw / p.width)), Image.LANCZOS), n, ok) for p, n, ok in ps]
-    gap = 90
+    gap = 168
     y_photo, y_panels = 250, 250 + photo.height + 190
     H = y_panels + cards[0][0].height + 250
 
@@ -87,6 +87,15 @@ def main() -> int:
         d.text((cx, by + 30), f"{ok}", font=font(72, True), fill=GREEN if i else DIM, anchor="ma")
         d.text((cx, by + 126), f"usable of the {n} candidates for the cable",
                font=font(24), fill=DIM, anchor="ma")
+
+    # the arrow between the two panels, with the factor it stands for
+    ax_ = x0 + pw + gap // 2
+    ay = y_panels + cards[0][0].height // 2
+    d.ellipse([ax_ - 62, ay - 62, ax_ + 62, ay + 62], fill=(22, 26, 32), outline=GREEN, width=3)
+    d.line([(ax_ - 34, ay), (ax_ + 12, ay)], fill=GREEN, width=9)
+    d.polygon([(ax_ + 4, ay - 24), (ax_ + 36, ay), (ax_ + 4, ay + 24)], fill=GREEN)
+    n0, n1 = cards[0][2], cards[1][2]
+    d.text((ax_, ay + 86), f"× {n1 / n0:.0f}", font=font(38, True), fill=GREEN, anchor="ma")
 
     y = H - 52
     d.text((W // 2 - 300, y), "──", font=font(24, True), fill=GREEN, anchor="ma")
