@@ -58,12 +58,13 @@ the good ones. This repository documents that, and the two things that fixed it 
 Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
 
-![all candidates for one object, same seed](figures/visor_shot_yt.png)
+![all candidates for one object, same seed](figures/visor_shot.png)
 
-<sub>One object in the box, every candidate GraspGen-X proposed, drawn the way the cell's
-own funnel viewer draws it. Red is killed by the container; green clears the walls, the
-floor, the neighbours and the whole descent. Left: as sampled. Right: after the
-regeneration of §4. Same seeded drop in both.</sub>
+<sub>A flat cable lying at the bottom of the box, every candidate GraspGen-X proposed,
+drawn the way the cell's own funnel viewer draws it. Red is killed by the container;
+green clears the walls, the floor, the neighbours and the whole descent. Left: as
+sampled — three of the four hundred are usable. Right: after the regeneration of §4.
+Same seeded drop in both runs.</sub>
 
 ![approach angles](figures/fig1_approach_angles.png)
 
@@ -127,8 +128,6 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
-![the same, for the flat cable at the bottom of the box](figures/visor_shot.png)
-
 Every candidate the cell had to choose from, drawn the way its own funnel viewer draws
 them: red if the container kills it, green if it clears the walls, the floor, the
 neighbours and the whole descent. Two runs of the same batch of three objects, with the
@@ -137,8 +136,17 @@ regeneration:
 
 | object | generate → filter | generate → regenerate → filter |
 |---|---|---|
-| `yellow_trim` (shown in §1) | **17** usable of 400 | **72** usable |
-| `usb_c_cable` (shown above) | **9** usable of 400 | **39** usable |
+| `usb_c_cable`, flat on the box floor (shown in §1) | **3** usable of 400 | **49** usable |
+| `usb_c_cable`, other batch | 9 usable of 400 | 39 usable |
+| `yellow_trim`, tall, reaching near the rim | 17 usable of 400 | 72 usable |
+| `power_drill`, bulky | 11 usable of 400 | **7 usable** |
+
+**The drill is the case where this does not pay off**, and it is worth stating plainly.
+Regenerating it drops 285 of the 400 contacts into a dead zone — no orientation of the
+gripper fits between the walls for those contact points — and the 115 that survive yield
+fewer usable grasps than filtering the raw samples did. The gain is largest exactly where
+the sampler struggles most: small or flat objects lying deep in the container. For a bulky
+object that already has viable top-down grasps, there is nothing to recover.
 
 The earlier pair of runs, without a seeded drop, gave the same picture:
 
