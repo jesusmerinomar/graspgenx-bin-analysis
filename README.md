@@ -125,20 +125,28 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
-![same gates, both sides](figures/cover.png)
+![all candidates, same seed](figures/visor_shot.png)
 
-The comparison is the cell's own gates — walls, floor, neighbouring objects and the full
-descent sweep — applied to both sides. Two runs of the same batch of three objects in the
-box, one with regeneration off and one on:
+Every candidate the cell had to choose from, drawn the way its own funnel viewer draws
+them: red if the container kills it, green if it clears the walls, the floor, the
+neighbours and the whole descent. Two runs of the same batch of three objects, with the
+drop seeded so the arrangement is **identical** in both — the only difference is the
+regeneration:
+
+| object | generate → filter | generate → regenerate → filter |
+|---|---|---|
+| `usb_c_cable` (shown above) | **9** usable of 400 | **39** usable |
+| `yellow_trim` | **17** usable of 400 | **72** usable |
+
+The earlier pair of runs, without a seeded drop, gave the same picture:
 
 | pick | generate → filter | generate → regenerate → filter |
 |---|---|---|
 | `yellow_trim` | 400 → 129 in cone → 58 → **32** | 400 → 273 regenerated → 262 → 200 → **84** |
 | `usb_c_cable` | 400 → 73 in cone → 30 → **8** | 400 → 197 regenerated → 196 → 119 → **46** |
 
-The batch is dropped into the box, so the two runs are not the same physical arrangement
-and these are two runs, not a statistic. The aggregate over the runs measured in §2 is
-3.9 survivors per attempt without regeneration and 55.4 with it.
+These are four pairs of picks, not a statistic. The aggregate over the runs measured in
+§2 is 3.9 survivors per attempt without regeneration and 55.4 with it.
 
 Notice where the candidates die without regeneration: of the 73 that clear the cone in
 the second row, **40 are killed by the scene gate**, which is the walls and the
@@ -213,6 +221,7 @@ is not enough to choose a grasp inside a box.
 | `data/candidate_angles.csv` | one row per candidate: attempt, object, stage (`raw` / `regenerated`), angle between approach direction and straight-down |
 | `data/per_trace_summary.csv` | one row per attempt: samples pointing up, inside the cone, inside the cone with flip, regenerated count |
 | `data/funnel_per_cell.csv` | one row per (object, pose) attempt inside the box: survivors after each gate, regeneration on/off, outcome |
+| `data/seed7/*.npz` | the seeded pair behind the figure in §4: every candidate, whether it clears the container, and the object cloud |
 | `data/gate_comparison/*.npz` | the two runs behind the figure in §4: candidate poses, whether each clears the container, and the object cloud |
 | `data/scene_gate_reasons.csv` | why regenerated candidates die at the scene gate |
 | `data/confidence_vs_feasibility.csv` | one row per candidate: discriminator confidence and whether it survived the container gates |
@@ -226,7 +235,8 @@ on edge, upside-down), not positions in the box.
 
 ```bash
 pip install -r requirements.txt
-python scripts/make_figures.py      # figures/ + headline numbers, from data/
+python scripts/make_figures.py       # figures/ + headline numbers, from data/
+python scripts/make_visor_shot.py    # the §4 figure, from data/seed7/
 ```
 
 ```bash
