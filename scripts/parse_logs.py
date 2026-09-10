@@ -7,6 +7,7 @@ The gate names match the log lines quoted in the README.
 """
 import csv, glob, os, re, sys
 
+# The cell logs in Spanish; these patterns match its own lines verbatim.
 rx_cell = re.compile(r"══ (\d+)/(\d+): ([a-z_0-9]+)\[(P\d)\] ══")
 rx_reg = re.compile(r"REGEN admisible★: (\d+) → (\d+) \((\d+) ya cabían · (\d+) REORIENTADOS, de ellos (\d+) volteados · (\d+) en zona muerta\)")
 rx_td = re.compile(r"filtro top-down: (\d+)/(\d+) agarres")
@@ -19,7 +20,7 @@ def g(rx, seg, k, cast=int):
     m = rx.search(seg)
     return cast(m.group(k)) if m else ""
 
-src = sys.argv[1] if len(sys.argv) > 1 else "/home/jesus/Escritorio/lab_logs"
+src = sys.argv[1] if len(sys.argv) > 1 else "lab_logs"
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "funnel_per_cell.csv")
 rows = []
 for f in sorted(glob.glob(os.path.join(src, "*.log")) + glob.glob(os.path.join(src, "barrida", "*.log"))):

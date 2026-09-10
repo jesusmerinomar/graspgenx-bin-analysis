@@ -14,7 +14,7 @@ holds the candidates after our constraint-aware regeneration step.
 import csv, glob, json, os, sys
 import numpy as np
 
-src = sys.argv[1] if len(sys.argv) > 1 else "/home/jesus/Escritorio/lab_logs/trazas_2026-09-05"
+src = sys.argv[1] if len(sys.argv) > 1 else "traces"
 here = os.path.dirname(os.path.abspath(__file__))
 data = os.path.join(here, "..", "data")
 
