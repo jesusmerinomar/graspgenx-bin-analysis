@@ -58,6 +58,13 @@ the good ones. This repository documents that, and the two things that fixed it 
 Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
 
+![all candidates for one object, same seed](figures/visor_shot_yt.png)
+
+<sub>One object in the box, every candidate GraspGen-X proposed, drawn the way the cell's
+own funnel viewer draws it. Red is killed by the container; green clears the walls, the
+floor, the neighbours and the whole descent. Left: as sampled. Right: after the
+regeneration of §4. Same seeded drop in both.</sub>
+
 ![approach angles](figures/fig1_approach_angles.png)
 
 | | raw samples |
@@ -120,7 +127,7 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
-![all candidates, same seed](figures/visor_shot_yt.png)
+![the same, for the flat cable at the bottom of the box](figures/visor_shot.png)
 
 Every candidate the cell had to choose from, drawn the way its own funnel viewer draws
 them: red if the container kills it, green if it clears the walls, the floor, the
@@ -130,8 +137,8 @@ regeneration:
 
 | object | generate → filter | generate → regenerate → filter |
 |---|---|---|
-| `yellow_trim` (shown above) | **17** usable of 400 | **72** usable |
-| `usb_c_cable` | **9** usable of 400 | **39** usable |
+| `yellow_trim` (shown in §1) | **17** usable of 400 | **72** usable |
+| `usb_c_cable` (shown above) | **9** usable of 400 | **39** usable |
 
 The earlier pair of runs, without a seeded drop, gave the same picture:
 
