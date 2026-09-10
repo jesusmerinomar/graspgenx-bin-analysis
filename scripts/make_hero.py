@@ -61,21 +61,18 @@ def main() -> int:
     pw = 820
     cards = [(p.resize((pw, int(p.height * pw / p.width)), Image.LANCZOS), n, ok) for p, n, ok in ps]
     gap = 168
-    y_photo, y_panels = 250, 250 + photo.height + 190
+    y_photo, y_panels = 300, 300 + photo.height + 160
     H = y_panels + cards[0][0].height + 250
 
     canvas = Image.new("RGBA", (W, H), BG + (255,))
     d = ImageDraw.Draw(canvas)
     d.text((W // 2, 60), "G R A S P G E N - X   I N S I D E   A   C O N T A I N E R",
            font=font(23, True), fill=DIM, anchor="ma")
-    d.text((W // 2, 108), "400 grasps proposed. Three of them fit.", font=font(58, True), fill=INK, anchor="ma")
-    d.text((W // 2, 186), "What a cardboard box does to an off-the-shelf grasp generator, and what "
-                          "regenerating the candidates recovers.", font=font(26), fill=DIM, anchor="ma")
+    d.text((W // 2, 104), "400 grasps proposed. Three of them fit.", font=font(86, True), fill=INK, anchor="ma")
+    d.text((W // 2, 216), "What a cardboard box does to an off-the-shelf grasp generator, and what "
+                          "regenerating the candidates recovers.", font=font(28), fill=DIM, anchor="ma")
 
     place(canvas, photo, ((W - photo.width) // 2, y_photo))
-    d.text((W // 2, y_photo + photo.height + 34),
-           "the cell: a flat USB-C cable and a drill inside a 38 × 18 × 14 cm box",
-           font=font(25), fill=DIM, anchor="ma")
 
     x0 = (W - (2 * pw + gap)) // 2
     for i, (card, n, ok) in enumerate(cards):
@@ -85,8 +82,7 @@ def main() -> int:
         place(canvas, card, (x, y_panels))
         cx, by = x + pw // 2, y_panels + card.height
         d.text((cx, by + 30), f"{ok}", font=font(72, True), fill=GREEN if i else DIM, anchor="ma")
-        d.text((cx, by + 126), f"usable of the {n} candidates for the cable",
-               font=font(24), fill=DIM, anchor="ma")
+        d.text((cx, by + 122), "usable, of the 400 proposed", font=font(34), fill=DIM, anchor="ma")
 
     # the arrow between the two panels, with the factor it stands for
     ax_ = x0 + pw + gap // 2
