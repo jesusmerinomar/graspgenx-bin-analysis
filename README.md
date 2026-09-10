@@ -58,11 +58,6 @@ the good ones. This repository documents that, and the two things that fixed it 
 Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
 
-![raw candidates inside the box](figures/fig0_hedgehog_yellow_trim.png)
-
-<sub>The 400 raw samples for one object in the box, and what is left after regeneration.
-Half of them approach from under the box floor.</sub>
-
 ![approach angles](figures/fig1_approach_angles.png)
 
 | | raw samples |
@@ -221,8 +216,8 @@ is not enough to choose a grasp inside a box.
 | `data/candidate_angles.csv` | one row per candidate: attempt, object, stage (`raw` / `regenerated`), angle between approach direction and straight-down |
 | `data/per_trace_summary.csv` | one row per attempt: samples pointing up, inside the cone, inside the cone with flip, regenerated count |
 | `data/funnel_per_cell.csv` | one row per (object, pose) attempt inside the box: survivors after each gate, regeneration on/off, outcome |
-| `data/seed7/*.npz` | the seeded pair behind the figure in §4: every candidate, whether it clears the container, and the object cloud |
-| `data/gate_comparison/*.npz` | the two runs behind the figure in §4: candidate poses, whether each clears the container, and the object cloud |
+| `data/seed7/*.npz` | the seeded pair behind the figure in §4 (`yt_` = yellow_trim, otherwise usb_c_cable): every candidate, whether it clears the container, and the object cloud |
+| `data/gate_comparison/*.npz` | the earlier, unseeded pair of runs quoted at the end of §4 |
 | `data/scene_gate_reasons.csv` | why regenerated candidates die at the scene gate |
 | `data/confidence_vs_feasibility.csv` | one row per candidate: discriminator confidence and whether it survived the container gates |
 | `gripper/wsg50_long/config.json` | the WSG-50 descriptor we feed to GraspGen-X (their wizard format) |
@@ -236,7 +231,7 @@ on edge, upside-down), not positions in the box.
 ```bash
 pip install -r requirements.txt
 python scripts/make_figures.py       # figures/ + headline numbers, from data/
-python scripts/make_visor_shot.py    # the §4 figure, from data/seed7/
+python scripts/make_visor_shot.py yt # the §4 figure, from data/seed7/
 ```
 
 ```bash
