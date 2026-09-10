@@ -125,7 +125,7 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
-![all candidates, same seed](figures/visor_shot.png)
+![all candidates, same seed](figures/visor_shot_yt.png)
 
 Every candidate the cell had to choose from, drawn the way its own funnel viewer draws
 them: red if the container kills it, green if it clears the walls, the floor, the
@@ -135,8 +135,8 @@ regeneration:
 
 | object | generate → filter | generate → regenerate → filter |
 |---|---|---|
-| `usb_c_cable` (shown above) | **9** usable of 400 | **39** usable |
-| `yellow_trim` | **17** usable of 400 | **72** usable |
+| `yellow_trim` (shown above) | **17** usable of 400 | **72** usable |
+| `usb_c_cable` | **9** usable of 400 | **39** usable |
 
 The earlier pair of runs, without a seeded drop, gave the same picture:
 

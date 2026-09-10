@@ -88,20 +88,21 @@ def panel(ax, d, b, elev=18, azim=-68):
     ax.scatter(cloud[::2, 0], cloud[::2, 1], cloud[::2, 2], s=2.0, c=CLOUD, alpha=0.8,
                lw=0, depthshade=False, zorder=5)
     cx, cy = (b["x0"] + b["x1"]) / 2, (b["y0"] + b["y1"]) / 2
-    hx = (b["x1"] - b["x0"]) / 2 + 0.03
+    hx = (b["x1"] - b["x0"]) / 2 + 0.075
     ax.set_xlim(cx - hx, cx + hx); ax.set_ylim(cy - hx, cy + hx)
-    ax.set_zlim(b["z0"] - 0.03, b["z0"] + 1.05 * hx)
-    ax.set_box_aspect((2 * hx, 2 * hx, 1.05 * hx + 0.03), zoom=1.9)
+    ax.set_zlim(b["z0"] - 0.07, b["z0"] + 1.05 * hx)
+    ax.set_box_aspect((2 * hx, 2 * hx, 1.05 * hx + 0.07), zoom=1.85)
     ax.view_init(elev=elev, azim=azim); ax.set_axis_off()
     return len(G), int(alive.sum())
 
 def main() -> int:
-    if len(sys.argv) > 2:                                  # two trace folders
+    if len(sys.argv) > 2 and os.path.isdir(sys.argv[1]):   # two trace folders
         doff, don, b = sys.argv[1], sys.argv[2], json.load(
             open(os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), "caja.json")))
     else:                                                  # the dumps committed under data/seed7
         D = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "seed7")
-        doff, don = os.path.join(D, "regen_off.npz"), os.path.join(D, "regen_on.npz")
+        pre = sys.argv[1] + "_" if len(sys.argv) > 1 else ""      # "" = usb_c_cable, "yt_" = yellow_trim
+        doff, don = os.path.join(D, pre + "regen_off.npz"), os.path.join(D, pre + "regen_on.npz")
         b = json.load(open(os.path.join(D, "box_geometry.json")))
     fig = plt.figure(figsize=(13, 5.6), facecolor=BG)
     for k, d in enumerate((doff, don)):
@@ -111,7 +112,7 @@ def main() -> int:
         fig.text(0.26 + 0.48 * k, 0.055, f"{ok} of {n} usable", ha="center", fontsize=15,
                  fontweight="bold", color=GREEN if k else "#555")
     fig.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.10, wspace=0.0)
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures", "visor_shot.png")
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures", f"visor_shot{'_yt' if len(sys.argv) > 1 and not os.path.isdir(sys.argv[1]) else ''}.png")
     fig.savefig(out, dpi=170, facecolor=BG); plt.close(fig)
     print("written", out)
     return 0
