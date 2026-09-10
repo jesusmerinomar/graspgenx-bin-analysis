@@ -246,7 +246,7 @@ on edge, upside-down), not positions in the box.
 ```bash
 pip install -r requirements.txt
 python scripts/make_figures.py       # figures/ + headline numbers, from data/
-python scripts/make_visor_shot.py yt # the §4 figure, from data/seed7/
+python scripts/make_visor_shot.py    # the §1 figure, from data/seed7/
 ```
 
 ```bash
