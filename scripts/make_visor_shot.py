@@ -25,6 +25,7 @@ SEGS = np.array([[(0, -HY, BAND0), (0, -HY, TIP)],          # finger A
                  [(0, -HY, CLOSE), (0, +HY, CLOSE)]])       # closing line
 GREEN, RED = "#28c85a", "#dc3c32"                            # the viewer's VERDE / ROJO
 BG, CLOUD, GRID = "#ffffff", "#5a6068", "#b9a06a"
+DARK = {"BG": "#0d0f13", "CLOUD": "#c8d0dc", "GRID": "#8d7448", "FLOOR": "#2a2419"}
 
 def gripper_lines(G):
     """(5, 2, 3) segments of one gripper, in world coordinates."""
@@ -49,11 +50,21 @@ def survivors(d):
     keep = {tuple(np.round(g, 5).ravel()) for g, a in zip(z["grasps"], z["vivos"]) if a}
     return G, np.array([tuple(np.round(g, 5).ravel()) in keep for g in G])
 
+def theme(dark):
+    """Swap the palette for the dark variant used by the cover."""
+    global BG, CLOUD, GRID, FLOOR
+    if dark:
+        BG, CLOUD, GRID, FLOOR = DARK["BG"], DARK["CLOUD"], DARK["GRID"], DARK["FLOOR"]
+    else:
+        BG, CLOUD, GRID, FLOOR = "#ffffff", "#5a6068", "#b9a06a", "#f0e6cf"
+
+FLOOR = "#f0e6cf"
+
 def draw_box(ax, b, nx=6, ny=3):
     x0, x1, y0, y1, z0, z1 = (b[k] for k in ("x0", "x1", "y0", "y1", "z0", "z1"))
     ax.add_collection3d(Poly3DCollection(
         [[(x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0)]],
-        facecolor="#f0e6cf", edgecolor="none", alpha=0.85, zorder=1))
+        facecolor=FLOOR, edgecolor="none", alpha=0.85, zorder=1))
     L = []
     for i in range(nx + 1):                                   # floor grid, as the viewer draws it
         x = x0 + (x1 - x0) * i / nx
@@ -95,8 +106,9 @@ def panel(ax, d, b, elev=18, azim=-68):
     ax.view_init(elev=elev, azim=azim); ax.set_axis_off()
     return len(G), int(alive.sum())
 
-def render_panel(d, b, out, size=(6.4, 5.6), dpi=150):
+def render_panel(d, b, out, size=(6.4, 5.6), dpi=150, dark=False):
     """One panel on its own, for the cover composition."""
+    theme(dark)
     fig = plt.figure(figsize=size, facecolor=BG)
     ax = fig.add_subplot(111, projection="3d", facecolor=BG)
     n, ok = panel(ax, d, b)

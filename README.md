@@ -15,7 +15,7 @@
 funnel viewer draws it. Both runs use the same seeded drop, so the only difference between
 them is the regeneration. Numbers and method in §4.</sub>
 
-[![the cell running, 2:26 at 1x speed](figures/video_thumb.png)](media/cell_demo.mp4)
+[![the cell running, 2:26 at 1x speed](figures/video_thumb.png)](https://github.com/jesusmerinomar/graspgenx-bin-analysis/blob/main/media/cell_demo.mp4)
 
 <sub>The cell these measurements come from — click to play (2:26, 1× speed, 9 MB). The
 small panel in its corner is the live candidate view: the grasps GraspGen-X proposed for

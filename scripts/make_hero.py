@@ -39,6 +39,13 @@ def place(canvas, img, xy, radius=RADIUS):
     canvas.alpha_composite(sh, (xy[0] - pad, xy[1] - pad))
     canvas.alpha_composite(card, xy)
 
+def trim(img, bg, tol=8):
+    """Drop the flat margin matplotlib leaves around the 3D axes."""
+    from PIL import ImageChops
+    ref = Image.new("RGB", img.size, bg)
+    box = ImageChops.difference(img.convert("RGB"), ref).convert("L").point(lambda v: 255 if v > tol else 0).getbbox()
+    return img.crop(box) if box else img
+
 def panels():
     spec = importlib.util.spec_from_file_location("vs", os.path.join(HERE, "make_visor_shot.py"))
     vs = importlib.util.module_from_spec(spec); sys.argv = ["x"]
@@ -48,9 +55,17 @@ def panels():
     out = []
     for tag in ("regen_off", "regen_on"):
         png = os.path.join(HERE, "..", "figures", "src", f"panel_{tag}.png")
-        n, ok = vs.render_panel(os.path.join(D, f"{tag}.npz"), b, png, size=(6.6, 5.2), dpi=170)
-        out.append((Image.open(png).convert("RGB"), n, ok))
-    return out
+        n, ok = vs.render_panel(os.path.join(D, f"{tag}.npz"), b, png, size=(6.6, 5.2), dpi=170, dark=True)
+        out.append((trim(Image.open(png).convert("RGB"), (13, 15, 19)), n, ok))
+    pad = 30
+    w = max(i.width for i, _, _ in out) + 2 * pad           # both panels share one frame,
+    h = max(i.height for i, _, _ in out) + 2 * pad          # so the numbers under them line up
+    fixed = []
+    for img, n, ok in out:
+        card = Image.new("RGB", (w, h), (13, 15, 19))
+        card.paste(img, ((w - img.width) // 2, (h - img.height) // 2))
+        fixed.append((card, n, ok))
+    return fixed
 
 def main() -> int:
     photo = Image.open(SRC).convert("RGB").crop((980, 540, 1844, 1240))
@@ -58,7 +73,7 @@ def main() -> int:
     photo = photo.resize((pw_photo, int(photo.height * pw_photo / photo.width)), Image.LANCZOS)
 
     ps = panels()
-    pw = 820
+    pw = 900
     cards = [(p.resize((pw, int(p.height * pw / p.width)), Image.LANCZOS), n, ok) for p, n, ok in ps]
     gap = 168
     y_photo, y_panels = 300, 300 + photo.height + 160
