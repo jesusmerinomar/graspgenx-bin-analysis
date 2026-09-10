@@ -11,10 +11,9 @@
 
 ![GraspGen-X inside a container](figures/hero.png)
 
-<sub>A flat cable lying at the bottom of a cardboard box, with the cell that measured it
-behind. Every candidate GraspGen-X proposed is drawn the way the cell's own funnel viewer
-draws it. Both runs use the same seeded drop, so the only difference between them is the
-regeneration. Numbers and method in §4.</sub>
+<sub>Every candidate GraspGen-X proposed for the cable, drawn the way the cell's own
+funnel viewer draws it. Both runs use the same seeded drop, so the only difference between
+them is the regeneration. Numbers and method in §4.</sub>
 
 <video src="https://github.com/jesusmerinomar/graspgenx-bin-analysis/raw/main/media/cell_demo.mp4" controls muted width="900"></video>
 
