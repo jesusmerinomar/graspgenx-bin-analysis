@@ -16,16 +16,13 @@ behind. Every candidate GraspGen-X proposed is drawn the way the cell's own funn
 draws it. Both runs use the same seeded drop, so the only difference between them is the
 regeneration. Numbers and method in §4.</sub>
 
-<table>
-  <tr>
-    <td><img src="figures/gifs/grasp1.gif" width="270" alt="picking headphones out of the box"></td>
-    <td><img src="figures/gifs/grasp2.gif" width="270" alt="picking a drill out of the box"></td>
-    <td><img src="figures/gifs/grasp3.gif" width="270" alt="picking a garment out of the box"></td>
-  </tr>
-</table>
+<video src="https://github.com/jesusmerinomar/graspgenx-bin-analysis/raw/main/media/cell_demo.mp4" controls muted width="900"></video>
 
-<sub>The cell these measurements come from, at 1× speed. Rigid objects and FEM garments,
-inside a 38 × 18 × 14 cm cardboard box.</sub>
+<sub>The cell these measurements come from, 2:26 at 1× speed
+([download](media/cell_demo.mp4) if the player does not load). The small panel in the
+corner is the live candidate view: the grasps GraspGen-X proposed for the object being
+picked, and the one that was chosen. Rigid objects and FEM garments, inside a
+38 × 18 × 14 cm cardboard box.</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
