@@ -9,12 +9,18 @@
 <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey">
 </p>
 
-![GraspGen-X inside a container](figures/cover.png)
+![GraspGen-X inside a container](figures/hero.png)
 
-<sub>The cell's own container gates — walls, floor, neighbouring objects, descent sweep —
-applied to both sides. Left: the sampler's candidates, 32 of 400 clear the box. Right:
-the same contacts regenerated under the container's constraints, 84 clear it. Three
-objects in the box; details and the second pick in §4.</sub>
+<table>
+  <tr>
+    <td><img src="figures/gifs/grasp1.gif" width="270" alt="picking headphones out of the box"></td>
+    <td><img src="figures/gifs/grasp2.gif" width="270" alt="picking a drill out of the box"></td>
+    <td><img src="figures/gifs/grasp3.gif" width="270" alt="picking a garment out of the box"></td>
+  </tr>
+</table>
+
+<sub>The cell these measurements come from, at 1× speed. Rigid objects and FEM garments,
+inside a 38 × 18 × 14 cm cardboard box.</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
@@ -119,10 +125,11 @@ a box, bad at saying **how** (the orientation). So instead of discarding a candi
 would hit a wall, we keep its contact point and look for an orientation that fits the
 container.
 
+![same gates, both sides](figures/cover.png)
+
 The comparison is the cell's own gates — walls, floor, neighbouring objects and the full
 descent sweep — applied to both sides. Two runs of the same batch of three objects in the
-box, one with regeneration off and one on. The figure at the top of this page shows the
-first row:
+box, one with regeneration off and one on:
 
 | pick | generate → filter | generate → regenerate → filter |
 |---|---|---|
