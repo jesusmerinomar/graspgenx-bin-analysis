@@ -15,11 +15,16 @@
 funnel viewer draws it. Both runs use the same seeded drop, so the only difference between
 them is the regeneration. Numbers and method in §4.</sub>
 
-![one complete pick](figures/gifs/one_pick.gif)
+<table>
+  <tr>
+    <td align="center"><img src="figures/gifs/pick_cable.gif" width="300" alt="picking the USB-C cable"><br><sub>USB-C cable</sub></td>
+    <td align="center"><img src="figures/gifs/pick_headphones.gif" width="300" alt="picking the headphones"><br><sub>headphones</sub></td>
+    <td align="center"><img src="figures/gifs/pick_drill.gif" width="300" alt="picking the drill"><br><sub>drill</sub></td>
+  </tr>
+</table>
 
-<sub>One complete pick at 1× speed: the cable at the bottom of the box, the descent
-between the walls, the close and the lift. The panel in the corner is the cell's live
-candidate view. Full 2:26 recording:
+<sub>Three complete picks at 1× speed: the descent between the walls, the close and the
+lift. The panel in each corner is the cell's live candidate view. Full 2:26 recording:
 [media/cell_demo.mp4](https://github.com/jesusmerinomar/graspgenx-bin-analysis/blob/main/media/cell_demo.mp4).</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
