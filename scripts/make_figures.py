@@ -62,6 +62,8 @@ fig.tight_layout(); fig.savefig(os.path.join(F, "fig2_funnel_in_box.png"), dpi=1
 
 # ── 3. the 180° flip about the closing axis ─────────────────────────────────
 tr = list(csv.DictReader(open(os.path.join(D, "per_trace_summary.csv"))))
+NAMES = {"black_gloves": "black gloves", "camiseta_doblada": "folded t-shirt",
+         "usb_c_cable": "USB-C cable", "yellow_trim": "yellow trim"}
 objs = sorted(set(r["object"] for r in tr))
 mr = [np.mean([int(r["n_in_cone60"]) for r in tr if r["object"] == o]) for o in objs]
 mf = [np.mean([int(r["n_in_cone60_with_flip"]) for r in tr if r["object"] == o]) for o in objs]
@@ -71,7 +73,7 @@ ax.bar(x - 0.2, mr, 0.4, color=C_RAW, label="raw samples inside the cone")
 ax.bar(x + 0.2, mf, 0.4, color=C_FLIP, label="raw ∪ flipped 180° about closing axis")
 for i in range(len(objs)):
     ax.text(x[i] - 0.2, mr[i] + 4, f"{mr[i]:.0f}", ha="center", fontsize=8.5); ax.text(x[i] + 0.2, mf[i] + 4, f"{mf[i]:.0f}", ha="center", fontsize=8.5)
-ax.set_xticks(x); ax.set_xticklabels(objs, fontsize=8.5); ax.set_ylabel("candidates in top-down cone (of 400)")
+ax.set_xticks(x); ax.set_xticklabels([NAMES.get(o, o) for o in objs], fontsize=8.5); ax.set_ylabel("candidates in top-down cone (of 400)")
 ax.set_ylim(0, 260); ax.set_title("A parallel gripper is symmetric: flipping each sample is free", fontsize=10.5)
 ax.legend(fontsize=8.5, frameon=False, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.0))
 fig.tight_layout(); fig.savefig(os.path.join(F, "fig3_flip.png"), dpi=160); plt.close(fig)
