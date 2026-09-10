@@ -95,6 +95,15 @@ def panel(ax, d, b, elev=18, azim=-68):
     ax.view_init(elev=elev, azim=azim); ax.set_axis_off()
     return len(G), int(alive.sum())
 
+def render_panel(d, b, out, size=(6.4, 5.6), dpi=150):
+    """One panel on its own, for the cover composition."""
+    fig = plt.figure(figsize=size, facecolor=BG)
+    ax = fig.add_subplot(111, projection="3d", facecolor=BG)
+    n, ok = panel(ax, d, b)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    fig.savefig(out, dpi=dpi, facecolor=BG); plt.close(fig)
+    return n, ok
+
 def main() -> int:
     if len(sys.argv) > 2 and os.path.isdir(sys.argv[1]):   # two trace folders
         doff, don, b = sys.argv[1], sys.argv[2], json.load(

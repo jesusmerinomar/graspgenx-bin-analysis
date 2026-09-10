@@ -11,6 +11,11 @@
 
 ![GraspGen-X inside a container](figures/hero.png)
 
+<sub>A flat cable lying at the bottom of a cardboard box, with the cell that measured it
+behind. Every candidate GraspGen-X proposed is drawn the way the cell's own funnel viewer
+draws it. Both runs use the same seeded drop, so the only difference between them is the
+regeneration. Numbers and method in §4.</sub>
+
 <table>
   <tr>
     <td><img src="figures/gifs/grasp1.gif" width="270" alt="picking headphones out of the box"></td>
@@ -57,14 +62,6 @@ the good ones. This repository documents that, and the two things that fixed it 
 
 Approach direction of the 400 raw GraspGen-X samples, for 45 attempts (18,000 candidates) on
 objects lying inside the box. 0° = straight down, 180° = straight up.
-
-![all candidates for one object, same seed](figures/visor_shot.png)
-
-<sub>A flat cable lying at the bottom of the box, every candidate GraspGen-X proposed,
-drawn the way the cell's own funnel viewer draws it. Red is killed by the container;
-green clears the walls, the floor, the neighbours and the whole descent. Left: as
-sampled — three of the four hundred are usable. Right: after the regeneration of §4.
-Same seeded drop in both runs.</sub>
 
 ![approach angles](figures/fig1_approach_angles.png)
 
@@ -136,7 +133,7 @@ regeneration:
 
 | object | generate → filter | generate → regenerate → filter |
 |---|---|---|
-| `usb_c_cable`, flat on the box floor (shown in §1) | **3** usable of 400 | **49** usable |
+| `usb_c_cable`, flat on the box floor (the cover) | **3** usable of 400 | **49** usable |
 | `usb_c_cable`, other batch | 9 usable of 400 | 39 usable |
 | `yellow_trim`, tall, reaching near the rim | 17 usable of 400 | 72 usable |
 | `power_drill`, bulky | 11 usable of 400 | **7 usable** |
