@@ -15,12 +15,12 @@
 funnel viewer draws it. Both runs use the same seeded drop, so the only difference between
 them is the regeneration. Numbers and method in §4.</sub>
 
-[![the cell running, 2:26 at 1x speed](figures/video_thumb.png)](https://github.com/jesusmerinomar/graspgenx-bin-analysis/blob/main/media/cell_demo.mp4)
+![one complete pick](figures/gifs/one_pick.gif)
 
-<sub>The cell these measurements come from — click to play (2:26, 1× speed, 9 MB). The
-small panel in its corner is the live candidate view: the grasps GraspGen-X proposed for
-the object being picked, and the one that was chosen. Rigid objects and FEM garments,
-inside a 38 × 18 × 14 cm cardboard box.</sub>
+<sub>One complete pick at 1× speed: the cable at the bottom of the box, the descent
+between the walls, the close and the lift. The panel in the corner is the cell's live
+candidate view. Full 2:26 recording:
+[media/cell_demo.mp4](https://github.com/jesusmerinomar/graspgenx-bin-analysis/blob/main/media/cell_demo.mp4).</sub>
 
 **What this is.** Numbers, figures and per-candidate data from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
