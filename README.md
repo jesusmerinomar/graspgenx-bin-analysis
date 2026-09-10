@@ -27,34 +27,33 @@ them is the regeneration. Numbers and method in §4.</sub>
 lift. The panel in each corner is the cell's live candidate view. Full 2:26 recording:
 [media/cell_demo.mp4](https://github.com/jesusmerinomar/graspgenx-bin-analysis/blob/main/media/cell_demo.mp4).</sub>
 
-**What this is.** Numbers, figures and per-candidate data from running
+**What this is.** Measurements from running
 [GraspGen-X](https://github.com/NVlabs/GraspGenX) (`b942909`) as the grasp generator of a
-bin-picking cell in simulation: a UR5e with a WSG-50 parallel gripper picking rigid
-objects and garments **out of a cardboard box**. GraspGen-X is used unmodified, through
-its public sampler API and our own gripper descriptor (`gripper/wsg50_long/config.json`,
-generated with their gripper wizard). Everything here is measured on that setup; nothing
-is tuned for the plot. Scripts under `scripts/` regenerate every figure from the CSVs
-under `data/`.
+bin-picking cell in simulation — a UR5e with a WSG-50 parallel gripper emptying a
+cardboard box — plus the per-candidate data behind every number. GraspGen-X is used
+unmodified and no code of theirs is copied here.
 
-**This is a continuation of their work, not a fork.** No GraspGen-X code is copied here.
-`scripts/run_graspgenx_on_example.py` shows how to reproduce our starting point from
-their repository and our example clouds, so every number below can be traced back to
-their sampler.
+- **The problem.** It is trained on free-floating objects. Inside a box every candidate
+  has to clear four walls, a floor and its neighbours, and filtering can only *remove*
+  candidates — it cannot create the ones the sampler never proposed.
+- **The measurement.** Of 400 samples, **3 to 17 are usable** depending on the object.
+- **The fix.** Regenerate each candidate under the container's constraints instead of
+  discarding it: **up to 16× more usable grasps** (§4).
 
-**Why we measured it.** GraspGen-X is trained on free-floating objects with SO(3)
-augmentation. On a table that is fine: you keep the top-down samples and discard the
-rest. **Inside a container it is not fine.** Every candidate has to clear four walls, a
-floor and whatever else is in the box, and the standard pipeline
-(*generate → filter by collision → rank*) can only *remove* candidates. It cannot create
-the ones the sampler never produced. The consequence, measured over 82 attempts inside a
-40 × 24 cm box: **of 400 samples, 4 survive on average**, and the 4 that survive are not
-the good ones. This repository documents that, and the two things that fixed it for us.
+<details>
+<summary>Setup</summary>
 
-> Setting: Isaac Sim 6.0.1 · UR5e · WSG-50 parallel gripper (110 mm stroke) ·
-> wrist RGB-D → segmented object point cloud → GraspGen-X (parallel-jaw descriptor,
-> 400 samples per object) · cardboard box, inner floor 40.2 × 24.0 cm, walls 14.4 cm ·
-> objects: gloves, socks, mesh bag, folded t-shirt (FEM cloth), mouse, drill, cube,
-> USB cable, trim · motion planning with cuRobo.
+Isaac Sim 6.0.1 · UR5e · WSG-50 parallel gripper (110 mm stroke) · wrist RGB-D →
+segmented object point cloud → GraspGen-X (parallel-jaw descriptor from
+`gripper/wsg50_long/config.json`, 400 samples per object) · cardboard box, inner floor
+40.2 × 24.0 cm, walls 14.4 cm · objects: gloves, socks, mesh bag, folded t-shirt (FEM
+cloth), mouse, drill, cube, USB cable, trim · motion planning with cuRobo.
+
+Nothing here is tuned for the plot, and `scripts/` regenerates every figure from `data/`.
+`scripts/run_graspgenx_on_example.py` reproduces our starting point against their own
+sampler, so every number traces back to it.
+
+</details>
 
 ---
 
@@ -90,21 +89,19 @@ post-descent pose; full descent sweep against the four walls.
 | generate → filter | 82 | 400 | 72.5 | 11.8 | 5.3 | **3.9** | 33 / 77 |
 | generate → **regenerate** → filter | 251 | 400 → 148.9 | 140.6 | 109.4 | 63.0 | **55.4** | 131 / 245 |
 
-Two things to notice:
+**The container is the killer, not the cone.** The cone removes 82 % of the samples,
+but the scene gate (walls, floor, neighbours) removes 84 % of what is left. On a table
+that gate is nearly a no-op. And with 4 survivors there is nothing left to rank: the
+failure mode moves from "no plan" to "grasped and slipped".
 
-1. **The container is the killer, not the cone.** The cone removes 82 % of the samples,
-   but the *scene* gate (walls, floor, neighbours) then removes 84 % of what is left,
-   and the wall sweep a further third. On a table the scene gate is nearly a no-op.
-2. **Fewer candidates means worse candidates.** With 4 survivors there is nothing to
-   rank. The survivors near a wall are systematically the perpendicular or nearly
-   vertical ones, which grab the least material. In our logs the failure mode moved
-   from "no plan" to "grasped and slipped": the system does not fail to find a grasp,
-   it confidently executes a bad one.
+<details>
+<summary>Caveat on the success-rate columns</summary>
 
-> The success-rate columns are **not** a clean A/B: the two groups come from different
-> weeks of development and other parts of the pipeline changed in between. The
-> candidate counts are the clean measurement; treat the outcomes as an order of
-> magnitude. A controlled comparison is in preparation.
+They are not a clean A/B: the two groups come from different weeks of development and
+other parts of the pipeline changed in between. The candidate counts are the clean
+measurement; treat the outcomes as an order of magnitude.
+
+</details>
 
 ## 3. Fix 1, free: flip every sample 180° about the closing axis
 
@@ -145,72 +142,33 @@ fewer usable grasps than filtering the raw samples did. The gain is largest exac
 the sampler struggles most: small or flat objects lying deep in the container. For a bulky
 object that already has viable top-down grasps, there is nothing to recover.
 
-The earlier pair of runs, without a seeded drop, gave the same picture:
-
-| pick | generate → filter | generate → regenerate → filter |
-|---|---|---|
-| `yellow_trim` | 400 → 129 in cone → 58 → **32** | 400 → 273 regenerated → 262 → 200 → **84** |
-| `usb_c_cable` | 400 → 73 in cone → 30 → **8** | 400 → 197 regenerated → 196 → 119 → **46** |
-
-These are four pairs of picks, not a statistic. The aggregate over the runs measured in
-§2 is 3.9 survivors per attempt without regeneration and 55.4 with it.
-
-Notice where the candidates die without regeneration: of the 73 that clear the cone in
-the second row, **40 are killed by the scene gate**, which is the walls and the
-neighbouring objects. That gate is nearly a no-op on a table.
-
 ![scene gate reasons](figures/fig4_scene_gate_reasons.png)
 
-The method itself, with baselines and ablations, is being written up separately. This
-repository contains the diagnosis, the flip, and this measurement.
+The method itself, with baselines and ablations, is being written up separately.
 
-## 5. Why the sampler's confidence cannot pick the grasp inside a box
+<details>
+<summary>An earlier pair of runs, and how far these numbers go</summary>
 
-Once candidates survive, one has to be chosen. GraspGen ships a discriminator whose
-confidence is meant to rank its own samples, and on a free-standing rigid object that
-is a reasonable choice. Inside a container, with garments, it is not, for two reasons
-we can measure.
+Before the drop was seeded, two runs of the same batch gave the same picture:
+`yellow_trim` 32 → 84 usable, `usb_c_cable` 8 → 46. Those two runs are not the same
+physical arrangement, which is why the seeded pair above replaced them.
 
-**It does not know about the box.** We took the discriminator's confidence of each
-candidate and asked whether it predicts surviving the container gates (walls, floor,
-neighbours, descent sweep). It does not: AUC 0.45 over 6,847 candidates, i.e. slightly
-*worse* than a coin flip, and of the 8 highest-confidence candidates per attempt only
-**1.4 fit in the box**.
+Four pairs of picks are not a statistic. The aggregate over the runs measured in §2 is
+3.9 survivors per attempt without regeneration and 55.4 with it.
+
+</details>
+
+## 5. The sampler's confidence cannot pick the grasp inside a box
+
+Its confidence does not predict whether a candidate fits: **AUC 0.45** over 6,847
+candidates, slightly worse than a coin flip. Of the 8 highest-confidence candidates per
+attempt, **1.4 fit in the box**.
 
 ![confidence vs box](figures/fig5_confidence_vs_box.png)
 
-**It does not know what a good closure is on our objects.** The discriminator was
-trained to tell a stable grasp from an unstable one on rigid meshes. Whether the jaws
-will close on *material*, and on the right material, is a different question, and on
-cloth it is the whole question. Over 328 closure/outcome pairs from our logs, the
-**shape of the closure** predicts the pick far better than any score assigned before it:
-
-| how the jaws closed | pick + place OK |
-|---|---|
-| both jaws stopped on material, symmetrically | 205 / 277 · **74 %** |
-| one jaw stopped, the other went to its stop | 2 / 12 · 17 % |
-| both jaws went to their stop (closed on nothing) | 1 / 39 · **3 %** |
-
-So the ranking has to look at the geometry of the closure itself, on the object's own
-point cloud, and it has to look at different things for different objects:
-
-- **where the centre of mass sits** relative to the closing line: off-centre grasps of
-  a rigid object twist and slip; on a garment the same offset is harmless;
-- **how much material ends up between the fingertips**, and whether it is the part
-  of the object the closure was aimed at, or a fold or an edge that will slide out;
-- **where the fingertips land**: on a rigid object a fingertip landing *on* the object
-  is a collision and the candidate must be vetoed; on cloth the material does not stop
-  at the jaw, so the same rule, applied blindly, vetoes almost every candidate;
-- **whether the closing line crosses the feature** (a cuff, a handle, a fold) or runs
-  along it, and whether it pinches the tip of the feature, from where it slips;
-- **verticality**, only as a mild tie-breaker so the planner does not get to choose;
-- and the sampler's confidence itself, used as a **floor**, not as the score: the
-  network's *no* travels much better than its *yes*.
-
-The weights, and which of these terms is a veto and which a multiplier, depend on the
-object class. That is the part we keep in the cell and do not describe here; the point
-of this section is only that a single confidence learned on a fixed set of rigid meshes
-is not enough to choose a grasp inside a box.
+It was trained on rigid meshes, so it scores stability, not whether the jaws close on
+material — which on cloth is the whole question. What a ranking has to look at instead,
+and why it differs per object class: [docs/ranking.md](docs/ranking.md).
 
 ## 6. Two questions we would like answered
 
@@ -221,7 +179,8 @@ is not enough to choose a grasp inside a box.
    traces it is present at sampling time. Is that expected from the training
    augmentation, and would a floor-aware conditioning be in scope?
 
-## Data
+<details>
+<summary><b>Data</b></summary>
 
 | file | content |
 |---|---|
@@ -238,7 +197,10 @@ is not enough to choose a grasp inside a box.
 Object poses P1–P4 in `funnel_per_cell.csv` are object orientations (canonical, lying,
 on edge, upside-down), not positions in the box.
 
-## Reproduce
+</details>
+
+<details>
+<summary><b>Reproduce</b></summary>
 
 ```bash
 pip install -r requirements.txt
@@ -254,7 +216,10 @@ GRASPGENX_CHECKPOINTS=<ckpt root> python scripts/run_graspgenx_on_example.py yel
 `scripts/export_from_traces.py` and `scripts/parse_logs.py` document how the CSVs were
 produced from the cell's per-candidate traces and run logs (not published; multi-GB).
 
-## Citing GraspGen-X
+</details>
+
+<details>
+<summary><b>Citing GraspGen-X</b></summary>
 
 Everything here builds on their model. If you use this repository, cite their work:
 
@@ -272,6 +237,8 @@ Everything here builds on their model. If you use this repository, cite their wo
 
 Thanks to the GraspGen-X authors for releasing the model, the checkpoints and the
 gripper wizard; without them none of this would exist.
+
+</details>
 
 ## Who
 
