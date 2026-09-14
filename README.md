@@ -242,7 +242,7 @@ gripper wizard; without them none of this would exist.
 
 ## Who
 
-Jesús Merino and Jorge Pascual, [NEURYN Robotics](https://neurynrobotics.com), Madrid.
+[Jesús Merino](https://github.com/jesusmerinomar) and [Jorge Pascual](https://github.com/JorgePascual1), [NEURYN Robotics](https://neurynrobotics.com), Madrid.
 Robot learning for garment handling. Contact: through GitHub or the website.
 
 MIT license.
